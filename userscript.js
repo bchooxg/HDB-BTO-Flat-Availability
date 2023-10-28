@@ -78,19 +78,15 @@
         msg += `\n${block}\n`;
 
         let seen_units = {};
-
+        // Parsing floors and units data
         for (const [floor, units] of Object.entries(floors)) {
           msg += floor;
-          let first_floor_flag =
-            floor == Object.keys(floors)[Object.keys(floors).length - 1];
-          //console.debug(`first_floor flag ${first_floor_flag} curr_floor ${floor} first floor ${Object.keys(floors)[Object.keys(floors).length - 1]} `)
           for (const [unit, unit_details] of Object.entries(units)) {
             if (unit_details.avail) {
               msg += "  🟢  ";
             } else {
               msg += "  🔴  ";
             }
-            //if (first_floor_flag){ msg += ` ${unit} `; }
             if (unit in seen_units) {
               seen_units[unit] += 1;
             } else {
@@ -99,16 +95,18 @@
           }
           msg += "\n";
         }
+        // Adding the Units at the bottom of the message
         msg += "   ";
         for (let unit of Object.keys(seen_units)) {
           msg += ` ${unit}  `;
         }
+        // Adding the quoata details
         msg += "\n";
         for (let [race, qty] of Object.entries(quota)) {
           msg += `   ${race}:${qty}`;
         }
         msg += "\n";
-        // Add Block Summary
+        // Adding Block Summary
         msg += `   Total:${summary.total} Taken:${summary.taken} Avail:${summary.avail}\n`;
       }
       // Add Project Summary
@@ -139,10 +137,10 @@
         let block_taken = 0;
 
         console.debug("Inside " + blocks[k]);
-        status.innerHTML = `Processing for ${blocks[k]}`;
         const grid = document.getElementById("available-grid");
         let floors = grid.getElementsByClassName("row level");
         select_block.value = k;
+        // Trigger new select button change
         var event = new Event("change");
         select_block.dispatchEvent(event);
 
@@ -178,7 +176,7 @@
             let curr_p2 = curr_unit_nodes[2].data;
             let curr_p3 = curr_unit_nodes[4].data;
             let curr_p4 =
-              curr_unit_label.parentElement.hasAttribute("disabled");
+              curr_unit_label.parentElement.hasAttribute("disabled"); // to check if a unit is selected and unavailable
             block_total += 1;
             if (curr_p4) {
               block_taken += 1;
@@ -204,13 +202,12 @@
       data.summary.total = project_total;
       data.summary.taken = project_taken;
       data.summary.avail = project_total - project_taken;
+
       text_area.value = JSON.stringify(data);
       let msg = formatMsg(data);
       text_area2.value = msg;
       text_area3.value = formatTeleMonospace(msg);
     }
 
-    // Once complete click the next select element and wait
-    // return a message
   }
 })();
