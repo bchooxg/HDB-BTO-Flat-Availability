@@ -125,6 +125,10 @@
       }
       // Add Project Summary
       msg += `\nTotal:${json.summary.total} Taken:${json.summary.taken} Avail:${json.summary.avail}`;
+      // Add Taken Units
+      if (taken_units.length != 0){
+        msg += `\n\nTaken Units:\n${taken_units.join("\n")}`;
+      }
       console.debug(msg);
       return msg;
     }
@@ -206,9 +210,7 @@
                 let prev_quota = prev_data.blocks[curr_block].quota;
 
                 for (const race in prev_quota){
-                  console.debug(`race = ${race} quota_obj[race]: ${quota_obj[race]} prev_quota[race] : ${prev_quota[race]} `)
                   if(quota_obj[race] !== prev_quota[race]){
-                    console.debug(`Found Race = ${race}`)
                     ethnic_type = race
                     prev_quota[race] = (parseInt(prev_quota[race]) + 1).toString();
                   }
@@ -244,7 +246,6 @@
       text_area2.value = msg;
       text_area3.value = formatTeleMonospace(msg);
       text_area5.value = taken_units.join("\n");
-      console.debug(`taken_units = ${taken_units}`);
       console.debug("Script Finished");
     }
 
