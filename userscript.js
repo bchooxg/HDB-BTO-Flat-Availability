@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HDB Flat Availability
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  Script to get the current available / taken flats for HDB BTO Selection
 // @author       You
 // @match        https://homes.hdb.gov.sg/home/bto/details/*
@@ -18,8 +18,13 @@
   }, 2000);
 
   function main() {
-    let data = { blocks: {}, summary: {} };
+    let curr_date = new Date();
+    let data = { blocks: {}, summary: {}, meta:{
+      created_time:`${curr_date.toLocaleString()}}`,
+      created_timestamp: `${curr_date.getTime()}`,
+    } };
     let blocks = [];
+    var taken_units = [];
 
     // Create a text area on screen
     let container_div = document.evaluate(
@@ -32,6 +37,14 @@
     const text_area = document.createElement("textarea"); // For JSON message
     const text_area2 = document.createElement("textarea"); // For normal non telegram forammted message
     const text_area3 = document.createElement("textarea"); // tele msg fomatted
+    const text_area4 = document.createElement("textarea"); // tele msg fomatted
+    const text_area5 = document.createElement("textarea"); // Taken units
+    // edit placeholder for text area
+    text_area.placeholder = "JSON Output";
+    text_area2.placeholder = "Formatted Messgage";
+    text_area3.placeholder = "Telegram Formatted Message";
+    text_area4.placeholder = "Paste Previous Data";
+    text_area5.placeholder = "Taken Units";
     const start_btn = document.createElement("button");
     const status = document.createElement("p");
 
@@ -48,11 +61,12 @@
     start_btn.onclick = function () {
       runner();
     };
-
+    container_div.appendChild(text_area4);
     container_div.appendChild(text_area);
     container_div.appendChild(start_btn);
     container_div.appendChild(text_area2);
     container_div.appendChild(text_area3);
+    container_div.appendChild(text_area5);
     container_div.appendChild(status);
     function formatTeleMonospace(msg) {
       let newMsg = "";
@@ -69,7 +83,7 @@
     function formatMsg(json) {
       let msg = "";
       msg = `${project}\n${room_type}\n`;
-      msg += `Generated on ${new Date().toLocaleString()}\n\n`;
+      msg += `Generated on ${curr_date.toLocaleString()}\n\n`;
 
       for (const [block, blk_details] of Object.entries(json.blocks)) {
         let floors = blk_details["unit_info"];
@@ -115,8 +129,11 @@
       return msg;
     }
 
+
     function runner() {
       console.debug("Running Script");
+
+      let prev_data = JSON.parse(text_area4.value);
 
       // Get the list of different blocks
       var select_block = document.querySelector('[aria-label="Block"]');
@@ -180,6 +197,9 @@
             block_total += 1;
             if (curr_p4) {
               block_taken += 1;
+              if(prev_data.blocks[curr_block].unit_info[curr_floor_text][curr_p1].avail){
+                taken_units.push(`${curr_block} ${curr_floor_text} ${curr_p1}`);
+              }
             }
 
             data["blocks"][curr_block]["unit_info"][curr_floor_text][curr_p1] =
@@ -207,6 +227,7 @@
       let msg = formatMsg(data);
       text_area2.value = msg;
       text_area3.value = formatTeleMonospace(msg);
+      text_area5.value = taken_units.join("\n");
     }
 
   }
