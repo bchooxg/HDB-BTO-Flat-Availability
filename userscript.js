@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HDB Flat Availability
 // @namespace    http://tampermonkey.net/
-// @version      0.6
+// @version      0.7
 // @description  Script to get the current available / taken flats for HDB BTO Selection
 // @author       You
 // @match        https://homes.hdb.gov.sg/home/bto/details/*
