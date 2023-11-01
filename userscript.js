@@ -133,7 +133,10 @@
     function runner() {
       console.debug("Running Script");
 
-      let prev_data = JSON.parse(text_area4.value);
+      let prev_data = null;
+      if(text_area4.value.length != 0){
+        prev_data = JSON.parse(text_area4.value);
+      }
 
       // Get the list of different blocks
       var select_block = document.querySelector('[aria-label="Block"]');
@@ -197,8 +200,21 @@
             block_total += 1;
             if (curr_p4) {
               block_taken += 1;
-              if(prev_data.blocks[curr_block].unit_info[curr_floor_text][curr_p1].avail){
-                taken_units.push(`${curr_block} ${curr_floor_text} ${curr_p1}`);
+              if(prev_data && prev_data.blocks[curr_block].unit_info[curr_floor_text][curr_p1].avail){
+                // predict ethnic type
+                let ethnic_type = "NA";
+                let prev_quota = prev_data.blocks[curr_block].quota;
+
+                for (const race in prev_quota){
+                  console.debug(`race = ${race} quota_obj[race]: ${quota_obj[race]} prev_quota[race] : ${prev_quota[race]} `)
+                  if(quota_obj[race] !== prev_quota[race]){
+                    console.debug(`Found Race = ${race}`)
+                    ethnic_type = race
+                    prev_quota[race] = (parseInt(prev_quota[race]) + 1).toString();
+                  }
+                }
+
+                taken_units.push(`${curr_block} ${curr_floor_text} ${curr_p1} ${ethnic_type}`);
               }
             }
 
@@ -228,6 +244,8 @@
       text_area2.value = msg;
       text_area3.value = formatTeleMonospace(msg);
       text_area5.value = taken_units.join("\n");
+      console.debug(`taken_units = ${taken_units}`);
+      console.debug("Script Finished");
     }
 
   }
