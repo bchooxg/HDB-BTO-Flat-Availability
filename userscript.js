@@ -15,7 +15,7 @@
   // Wait for 2 Seconds for Ajax queries to complete first before running script
   setTimeout(() => {
     main();
-  }, 2000);
+  }, 4000);
 
   function main() {
     let curr_date = new Date();
